@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'draw/vendor/bootstrap/css/bootstrap.min.css' %}">
     <script type="text/javascript" src="{% static 'draw/vendor/jquery/jquery-3.3.1.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'draw/vendor/paper/paper-full.min.js' %}"></script>
+    <script src="./path/to/dropzone.js"></script>
 
     <style type="text/css">
     </style>
@@ -37,12 +38,16 @@
     
     var pathA = new paper.Path();
     pathA.strokeColor = 'blue';
+    pathA.strokeColor.hue += clientID;
     var points = [];
+  
+   var circle = new paper.Path.Circle(new paper.Point(80, 50), 30);
+   circle.fillColor = 'blue';
  
   
    
   
-     tool.onMouseMove = function (event) {
+      tool.onMouseMove = function (event) {
       pathA.lineTo(event.point);
       //console.log(event.point);
       points.push(event.point);
@@ -56,6 +61,9 @@
     
       socket.send(JSON.stringify(msg));
   }
+     
+     
+     
      
      
      
@@ -91,23 +99,51 @@
       
        
        
-};
+}; 
   
-  // triggered when receiving a message from the server
-//socket.onmessage = function(receivedMessage) {
-	// do something when you receive a message
-//};
+  
+  
 
-// use when sending a message to the server
-// to be broadcasted to all clients
-//socket.send(message);
 
 // notify console if socket closes unexpectedly
 socket.onclose = function(e) {
     console.error('Chat socket closed unexpectedly');
 };
-
-
+  
+  window.ondeviceorientation = function(event) {
+    var x = event.gamma;
+    if (x < 0) {
+      if (pathA.strokeColor = 'blue') {
+        pathA.strokeColor = 'red';
+      } else{
+        pathA.strokeColor = 'blue';
+      }
+    }  
+  };
+ 
+  
+  
+ 
+  
+  window.addEventListener('devicemotion', function(event) {
+    var firstx = event.accelerationIncludingGravity.x;
+    var firsty = event.accelerationIncludingGravity.y;
+    var firstz = event.accelerationIncludingGravity.z; 
+    var nextx = 0;
+    var nexty = 0;
+    var nextz = 0; 
+  }, false);
+      
+    if (Math.abs(firstx - nextx + firsty - nexty + firstz - nextz) > 3) {
+      paper.project.activeLayer.removeChildren();
+    }
+    
+    nextx = firstx;
+    nexty = firsty;
+    nextz = firstz; //this isnt getting called for some reason, like its not highlighted 
+    
+  
+ 
   
 
 
