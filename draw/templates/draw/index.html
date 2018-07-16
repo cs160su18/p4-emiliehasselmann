@@ -9,30 +9,45 @@
     <link rel="stylesheet" type="text/css" href="{% static 'draw/vendor/bootstrap/css/bootstrap.min.css' %}">
     <script type="text/javascript" src="{% static 'draw/vendor/jquery/jquery-3.3.1.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'draw/vendor/paper/paper-full.min.js' %}"></script>
-    <script src="./path/to/dropzone.js"></script>
+  <script type="text/javascript" src="https://cdn.rawgit.com/alexgibson/shake.js/master/shake.js"></script>
+   
+
 
     <style type="text/css">
+      h1 {color: black;}
     </style>
 
 </head>
 <body>
     <!-- You may change the dimensions of this canvas -->
-    <canvas id="myCanvas" width="750px" height="750px"></canvas>
+    <!-- <canvas id="myCanvas" width="750px" height="750px"></canvas> --> 
+    <h1 id="myTitle">Past Reviews</h1>
+    <ul id="list">
+       
+    </ul>
+    <textarea name="textarea"
+    rows="10" cols="50">How was the show?</textarea>
+    <button type="button" class="btn btn-light" onclick="upload()">Upload</button>
+  
+    
+  
 </body>
 <script>  
     // setting up the canvas and one paper tool
-    var canvas = document.getElementById('myCanvas');
+    /** var canvas = document.getElementById('myCanvas');
     paper.setup(canvas);
-    var tool = new paper.Tool();
+    var tool = new paper.Tool(); */
 
     // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
     console.log(url);
   
 
+  
+
 
   
-   var clientID = Math.random() * Math.random() * 300;
+   /* var clientID = Math.random() * Math.random() * 300;
    var socket = new WebSocket('ws://p4-emiliehasselmann-emiliehasselmann408236.codeanyapp.com:8765/');
    
     
@@ -41,13 +56,13 @@
     pathA.strokeColor.hue += clientID;
     var points = [];
   
-   var circle = new paper.Path.Circle(new paper.Point(80, 50), 30);
-   circle.fillColor = 'blue';
+  /* var circle = new paper.Path.Circle(new paper.Point(80, 50), 30);
+   circle.fillColor = 'blue'; */
  
   
    
   
-      tool.onMouseMove = function (event) {
+     /* tool.onMouseMove = function (event) {
       pathA.lineTo(event.point);
       //console.log(event.point);
       points.push(event.point);
@@ -57,19 +72,12 @@
         y: event.point.y, 
         color: pathA.strokeColor,
         points: points
-      };
+      };*/
     
-      socket.send(JSON.stringify(msg));
-  }
      
+      
      
-     
-     
-     
-     
-     
-     
-     socket.onmessage = function(receivedMessage) {
+     /*socket.onmessage = function(receivedMessage) {
        if (url == "http://p4-emiliehasselmann-emiliehasselmann408236.codeanyapp.com:8000/draw/?size=large") {
          
        
@@ -100,6 +108,18 @@
        
        
 }; 
+      
+    var shakeEvent = new Shake({threshold: 8});
+    shakeEvent.start();
+    window.addEventListener('shake', function(){
+      $('#myTitle').hide(); 
+        
+    }, false);
+
+    //stop listening
+    function stopShake(){
+        shakeEvent.stop();
+    }
   
   
   
@@ -113,19 +133,22 @@ socket.onclose = function(e) {
   window.ondeviceorientation = function(event) {
     var x = event.gamma;
     if (x < 0) {
-      if (pathA.strokeColor = 'blue') {
+      /**if (pathA.strokeColor = 'blue') {
         pathA.strokeColor = 'red';
       } else{
         pathA.strokeColor = 'blue';
-      }
-    }  
-  };
- 
+      } 
+      $('#myTitle').css("color", "red");
+    } 
+    else if (x > 0) {
+      $('#myTitle').css("color", "blue");
+    }
+  }; */
   
   
  
   
-  window.addEventListener('devicemotion', function(event) {
+  /**window.addEventListener('devicemotion', function(event) {
     var firstx = event.accelerationIncludingGravity.x;
     var firsty = event.accelerationIncludingGravity.y;
     var firstz = event.accelerationIncludingGravity.z; 
@@ -134,16 +157,63 @@ socket.onclose = function(e) {
     var nextz = 0; 
   }, false);
       
-    if (Math.abs(firstx - nextx + firsty - nexty + firstz - nextz) > 3) {
-      paper.project.activeLayer.removeChildren();
+    if (Math.abs(firstx - nextx + firsty - nexty + firstz - nextz) > 15) {
+      $('#myTitle').hide(); 
     }
     
     nextx = firstx;
     nexty = firsty;
-    nextz = firstz; //this isnt getting called for some reason, like its not highlighted 
+    nextz = firstz; */
+  
+  
+  
+  /* Exercise 3 */
+  var socket = new WebSocket('ws://p4-emiliehasselmann-emiliehasselmann408236.codeanyapp.com:8765/'); 
+  socket.onopen = function (event) {
+  console.log("connection!")
+  };
+  
+  //console.log($("textarea").val());
+  
+  function upload() {
+    var msg = {
+      type: "message",
+      text: $("textarea").val(),
+      //id: clientID,
+      date: Date.now()
+    }; 
+    
+    
+    
+    
+    socket.send(JSON.stringify(msg));
+    /** function upload() {
+    socket.send(document.getElementById("textarea").value;)
+     } */
+  }
+  //textarea.onclick = upload();
+    
+      //We just have to set this one to be the onclick function for the upload button I made   
+    socket.onmessage = function(receivedMessage) {
+    var review = JSON.parse(receivedMessage.data);
+    var message = review.text;
+    console.log(message);
+    var reviews = document.getElementById("list");
+    var newReview = document.createElement("newReview");
+    newReview.id = "newReview";
+    newReview.innerHTML = message +'<br/>';
+    //var lineBreak = "/n"
+    //newReview.appendChild(document.createTextNode(message));
+    reviews.appendChild(newReview);
+	  //$('#myTitle').html(message) ///oh add a break somewhere maybe and then it'll go to the next line? Ok yeah that makes sense
+    };
+    
+    
+    
+    //document.getElementById("text").value = ""; 
+    
     
   
- 
   
 
 
